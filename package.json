@@ -17,7 +17,8 @@
   },
   "homepage": "https://github.com/czjs2/yeedriver-iracc#readme",
   "dependencies": {
+    "modbus-serial": "^5.3.2",
     "qz-jobqueue": "^1.0.0",
-    "yeedriver-modbustcpconv": "^1.0.0"
+    "yeedriver-modbustcpconv": "^1.0.4"
   }
 }
