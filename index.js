@@ -12,7 +12,7 @@ const ModbusRTU = require("qz-modbus-serial");
 const util = require('util');
 
 const _ = require('lodash');
-const vm = require('vm');
+const P = require('bluebird');
 const MAX_WRITE_CNT = 50;
 const IRACC = require('./iracc');
 /**
@@ -80,10 +80,10 @@ class IRACCMaster extends ModbusBase {
             }
         })
 
-        setTimeout(()=>{
-            _.each(this.ids,(mbId)=>{
+        let findOnline = ()=>{
+            P.each(this.ids,(mbId)=>{
                 let ctrlData = {func: 0x04, ac_devId: mbId, reg_start: 0x01, reg_len: 4};
-                this.sendCtrl(ctrlData).then((data) => {
+                return this.sendCtrl(ctrlData).then((data) => {
                     for (let i = 0; i < 4 && i < (data ? data.length : 0); i++) {
                         for (let j = 0; j < 16; j++) {
                             if (data[i] & (1 << j)) {
@@ -96,11 +96,18 @@ class IRACCMaster extends ModbusBase {
 
                         }
                     }
+                    return P.resolve();
                 })
+            }).then(()=>{
+                this.setRunningState(this.RUNNING_STATE.CONNECTED);
+            }).catch(()=>{
+                setTimeout(findOnline,500)
             });
 
-            this.setRunningState(this.RUNNING_STATE.CONNECTED);
-        },500)
+
+        }
+
+        setTimeout(findOnline,500)
 
         this.setupEvent();
 
@@ -143,7 +150,14 @@ class IRACCMaster extends ModbusBase {
 
 IRACCMaster.prototype.sendCtrl=function(data){
 
-    return this.jobQueue.push(data);
+    return this.jobQueue.push(data).then((result)=>{
+        if(result.success){
+            return P.resolve(result.result);
+        }
+        else{
+            return P.reject(result.reason)
+        }
+    });
 }
 IRACCMaster.prototype.doSendData = function(data){
     if(this.mbClient){
@@ -235,6 +249,8 @@ IRACCMaster.prototype.setInOrEx = function () {
             if (!_.isEmpty(delDevices)) {
                 this.inOrEx({type: "ex", devices: delDevices});
             }
+        }).catch((e)=>{
+            console.error(e);
         })
 
 

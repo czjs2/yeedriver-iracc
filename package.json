@@ -1,6 +1,6 @@
 {
   "name": "yeedriver-iracc",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "IRACC AC gateway for yeedriver",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   "homepage": "https://github.com/czjs2/yeedriver-iracc#readme",
   "dependencies": {
     "modbus-serial": "^5.3.2",
-    "qz-jobqueue": "^1.0.0",
-    "yeedriver-modbustcpconv": "^1.0.4"
+    "qz-jobqueue": "^1.0.4",
+    "yeedriver-modbustcpconv": "^1.1.1"
   }
 }

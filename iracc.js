@@ -4,6 +4,7 @@
 
 const ModbusBase = require('yeedriver-modbustcpconv');
 const _ = require('lodash');
+const P = require('bluebird');
 const MODE={
     UNDEF:0,
     VENT:1,  //风机
@@ -218,7 +219,7 @@ class  IRACC  {
 
         return this.mbWriter.sendCtrl(writeBuf);
     }else{
-        return Q.reject(`error of devId:${this.devId} `);
+        return P.reject(`error of devId:${this.devId} `);
     }
 
     }
