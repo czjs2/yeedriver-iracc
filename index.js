@@ -28,21 +28,25 @@ class IRACCMaster extends ModbusBase {
         this.jobQueue = new JobQueue({consumer:this.doSendData.bind(this)});
         this.curCallIndex = 0;
         this.call_buffer = [];
-        let self = this;
-        function callACState(){
-            self.autoCallHandler = null;
-            if(self.curCallIndex < self.call_buffer.length){
-                let sendData =  _.clone(self.call_buffer[self.curCallIndex]);
-                self.sendCtrl(sendData).then((data)=>{
-                    self.devices[sendData.devId] && self.devices[sendData.devId].updateACState(data);
-                    self.emit('RegRead',{devId:devId ,memories:this.autoReadMaps[devId]});
+
+
+        let callACState = ()=>{
+            this.autoCallHandler = null;
+            if(this.curCallIndex < this.call_buffer.length){
+                let sendData =  _.clone(this.call_buffer[this.curCallIndex]);
+                this.sendCtrl(sendData).then((data)=>{
+                    this.devices[sendData.devId] && this.devices[sendData.devId].updateACState(data);
+                    this.emit('RegRead',{devId:devId ,memories:this.autoReadMaps[devId]});
                 }).finally(()=>{
-                    self.curCallIndex++;
-                    if(self.curCallIndex >= self.call_buffer.length){
-                        self.curCallIndex = 0;
+                    this.curCallIndex++;
+                    if(this.curCallIndex >= this.call_buffer.length){
+                        this.curCallIndex = 0;
                     }
-                    self.autoCallHandler = setTimeout(function(){callACState();},200);
+                    this.autoCallHandler = setTimeout(function(){callACState();},200);
                 })
+            }
+            else{
+                this.autoCallHandler = setTimeout(function(){callACState();},200);
             }
         }
         this.autoCallHandler = setTimeout(callACState,100);
@@ -56,7 +60,7 @@ class IRACCMaster extends ModbusBase {
 
         this.ids = options.ids.split(',') || [];
 
-        this.call_buffer = [];
+        this.call_buffer =  [];
 
         this.drivers = this.drivers || [];
 
@@ -210,14 +214,14 @@ IRACCMaster.prototype.setInOrEx = function () {
                             uniqueId:'ac',
                             groupId:".",
                         }
-                        this.devices[devId] = new IRACC(devId, this);
-                        this.call_buffer.push({
-                            devId: devId,
-                            func: 0x04,
-                            ac_devId: mbId,
-                            reg_start: 0x07d0 + 6 * index,
-                            reg_len: 6
-                        });
+                        // this.devices[devId] = new IRACC(devId, this);
+                        // this.call_buffer.push({
+                        //     devId: devId,
+                        //     func: 0x04,
+                        //     ac_devId: mbId,
+                        //     reg_start: 0x07d0 + 6 * index,
+                        //     reg_len: 6
+                        // });
 
                     }
                     if(this.sids[devId] && !(data[i] & (0x01<<j)) ){
