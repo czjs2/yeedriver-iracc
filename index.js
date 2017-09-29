@@ -36,7 +36,9 @@ class IRACCMaster extends ModbusBase {
                 let sendData =  _.clone(this.call_buffer[this.curCallIndex]);
                 this.sendCtrl(sendData).then((data)=>{
                     this.devices[sendData.devId] && this.devices[sendData.devId].updateACState(data);
-                    this.emit('RegRead',{devId:devId ,memories:this.autoReadMaps[devId]});
+                    this.emit('RegRead',{devId:sendData.devId ,memories:this.autoReadMaps[sendData.devId]});
+                }).catch((e)=>{
+                    console.error(`error in call AC State:${e.message || e}`);
                 }).finally(()=>{
                     this.curCallIndex++;
                     if(this.curCallIndex >= this.call_buffer.length){
