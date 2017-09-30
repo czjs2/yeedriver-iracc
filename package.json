@@ -1,6 +1,6 @@
 {
   "name": "yeedriver-iracc",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "IRACC AC gateway for yeedriver",
   "main": "index.js",
   "scripts": {
